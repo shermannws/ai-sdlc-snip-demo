@@ -10,7 +10,13 @@ export interface Link {
   createdAt: string;
 }
 
-const API = 'http://localhost:3000';
+// Same-origin by default so the bundled app works wherever it is deployed
+// (e.g. Railway). Only the standalone Angular dev server (port 4200) needs to
+// reach the separate backend on port 3000.
+const API =
+  typeof window !== 'undefined' && window.location.port === '4200'
+    ? 'http://localhost:3000'
+    : '';
 
 @Injectable({ providedIn: 'root' })
 export class LinkService {
