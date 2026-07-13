@@ -1,0 +1,61 @@
+<div class="container">
+  <h1>Snip</h1>
+
+  <div class="card">
+    <form (ngSubmit)="submit()" #f="ngForm">
+      <div class="form-row">
+        <input
+          type="url"
+          [(ngModel)]="inputUrl"
+          name="url"
+          placeholder="https://example.com/long/url"
+          required
+        />
+        <button type="submit" [disabled]="!urlValid || submitting()">
+          {{ submitting() ? 'Shortening…' : 'Shorten' }}
+        </button>
+      </div>
+    </form>
+
+    @if (createdLink()) {
+      <p class="success">
+        Short link:
+        <a [href]="createdLink()!.shortUrl" target="_blank" rel="noopener">
+          {{ createdLink()!.shortUrl }}
+        </a>
+      </p>
+    }
+    @if (formError()) {
+      <p class="error">{{ formError() }}</p>
+    }
+  </div>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Original URL</th>
+          <th>Hits</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (links().length === 0) {
+          <tr><td colspan="3" class="empty">No links yet.</td></tr>
+        }
+        @for (link of links(); track link.code) {
+          <tr>
+            <td class="code">
+              <a [href]="link.shortUrl" target="_blank" rel="noopener">{{ link.code }}</a>
+            </td>
+            <td class="url" [title]="link.url">{{ link.url }}</td>
+            <td class="hits">{{ link.hits }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (loadError()) {
+      <p class="error">{{ loadError() }}</p>
+    }
+  </div>
+</div>
