@@ -52,10 +52,12 @@ ai-sdlc-snip-demo (GitHub repo)
 │     backend/   ──► submodule → branch: backend
 │     frontend/  ──► submodule → branch: frontend
 │     cli/       ──► submodule → branch: cli
+│     bundle/    ──► submodule → branch: bundle  (generated output)
 │
 ├── branch: backend   ← Express server source
 ├── branch: frontend  ← Angular 19 app source
-└── branch: cli       ← Bun CLI source
+├── branch: cli       ← Bun CLI source
+└── branch: bundle    ← GENERATED — do not hand-edit (see scripts/build-bundle.mjs)
 ```
 
 Each submodule folder is a full Git checkout of the same remote repo on its own branch.  
@@ -117,6 +119,39 @@ node cli.js shorten https://example.com/very/long/path
 # List all links
 node cli.js list
 ```
+
+---
+
+## Bundle branch — generated deployment artifact
+
+The `bundle` branch (mounted at `bundle/`) is **machine-generated**. Never push to it by hand.
+
+It contains a self-contained deployable snapshot:
+
+```
+bundle/
+  server.js       ← copied from backend/
+  cli.js          ← copied from cli/
+  public/         ← Angular production build output
+  .env            ← PUBLIC_DIR=./public  (Bun auto-loads)
+  package.json    ← { "start": "bun server.js" }  (no "type" field)
+  Dockerfile      ← FROM oven/bun:1-alpine, ENV PORT=3000, EXPOSE 3000
+  .dockerignore
+  railway.json    ← selects the DOCKERFILE builder
+```
+
+### Regenerating / releasing
+
+```bash
+# Build locally, commit into bundle/ and bump superproject pointer (no push):
+node scripts/build-bundle.mjs
+
+# Same, but also push the bundle branch and main:
+node scripts/build-bundle.mjs --push
+```
+
+The script is a **safe no-op** when nothing has changed — it checks the staged diff
+before every `git commit` and skips it silently.
 
 ---
 
