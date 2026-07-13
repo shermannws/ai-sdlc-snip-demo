@@ -1,61 +1,68 @@
-<div class="container">
-  <h1>Snip</h1>
+<main class="page">
+  <section class="hero">
+    <h1 class="hero-title">Snip</h1>
+    <p class="hero-sub">Paste a long URL and get a short one instantly.</p>
 
-  <div class="card">
-    <form (ngSubmit)="submit()" #f="ngForm">
-      <div class="form-row">
-        <input
-          type="url"
-          [(ngModel)]="inputUrl"
-          name="url"
-          placeholder="https://example.com/long/url"
-          required
-        />
-        <button type="submit" [disabled]="!urlValid || submitting()">
-          {{ submitting() ? 'Shortening�' : 'Shorten' }}
-        </button>
-      </div>
-    </form>
+    <div class="shorten-card">
+      <form (ngSubmit)="submit()" #f="ngForm">
+        <div class="input-row">
+          <input
+            class="url-input"
+            type="url"
+            [(ngModel)]="inputUrl"
+            name="url"
+            placeholder="https://example.com/your/very/long/url"
+            autocomplete="off"
+            required
+          />
+          <button class="btn-primary" type="submit" [disabled]="!urlValid || submitting()">
+            {{ submitting() ? 'Shortening…' : 'Shorten' }}
+          </button>
+        </div>
+      </form>
 
-    @if (createdLink()) {
-      <p class="success">
-        Short link:
-        <a [href]="createdLink()!.shortUrl" target="_blank" rel="noopener">
-          {{ createdLink()!.shortUrl }}
-        </a>
-      </p>
-    }
-    @if (formError()) {
-      <p class="error">{{ formError() }}</p>
-    }
-  </div>
+      @if (createdLink()) {
+        <div class="notice notice-success">
+          Short link ready:
+          <a [href]="createdLink()!.shortUrl" target="_blank" rel="noopener">
+            {{ createdLink()!.shortUrl }}
+          </a>
+        </div>
+      }
+      @if (formError()) {
+        <div class="notice notice-error">{{ formError() }}</div>
+      }
+    </div>
+  </section>
 
-  <div class="card">
-    <table>
-      <thead>
-        <tr>
-          <th>Code</th>
-          <th>Original URL</th>
-          <th>Hits</th>
-        </tr>
-      </thead>
-      <tbody>
-        @if (links().length === 0) {
-          <tr><td colspan="3" class="empty">No links yet.</td></tr>
-        }
-        @for (link of links(); track link.code) {
+  <section class="links-section">
+    <div class="panel">
+      <table class="links-table">
+        <thead>
           <tr>
-            <td class="code">
-              <a [href]="link.shortUrl" target="_blank" rel="noopener">{{ link.code }}</a>
-            </td>
-            <td class="url" [title]="link.url">{{ link.url }}</td>
-            <td class="hits">{{ link.hits }}</td>
+            <th>Code</th>
+            <th>Original URL</th>
+            <th class="hits">Hits</th>
           </tr>
-        }
-      </tbody>
-    </table>
-    @if (loadError()) {
-      <p class="error">{{ loadError() }}</p>
-    }
-  </div>
-</div>
+        </thead>
+        <tbody>
+          @if (links().length === 0) {
+            <tr><td colspan="3" class="empty">No links yet — shorten one above.</td></tr>
+          }
+          @for (link of links(); track link.code) {
+            <tr>
+              <td class="code">
+                <a [href]="link.shortUrl" target="_blank" rel="noopener">{{ link.code }}</a>
+              </td>
+              <td class="url" [title]="link.url">{{ link.url }}</td>
+              <td class="hits">{{ link.hits }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      @if (loadError()) {
+        <div class="notice notice-error panel-notice">{{ loadError() }}</div>
+      }
+    </div>
+  </section>
+</main>
